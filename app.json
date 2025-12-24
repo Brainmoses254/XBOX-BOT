@@ -1,14 +1,14 @@
 {
-  "name": "sᴛᴀʀ xᴅ",
+  "name": "Xboxboy",
   "description": "This is a bot for managing group commands and automating tasks.",
   "repository": "https://github.com/XdKing2/star-xd",
-  "logo": "https://i.ibb.co/bjTC9sF5/malvin-xd.jpg",
+  "logo": "https://files.catbox.moe/8iqspb.jpg",
   "keywords": ["bot", "whatsapp", "whatsapp-bot", "automation"],
   "success_url": "/",
   "env": {
     "BOT_NAME": {
       "description": "Name of your bot",
-      "value": "sᴛᴀʀ xᴅ",
+      "value": "Xbox bot",
       "required": true
     },
     "OWNER_NAME": {
@@ -18,7 +18,7 @@
     },
     "OWNER_NUMBER": {
       "description": "Owner's phone number with country code",
-      "value": "1234567890",
+      "value": "254710329917",
       "required": true
     },
     "SESSION_ID": {
