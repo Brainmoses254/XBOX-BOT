@@ -1,5 +1,5 @@
 {
-  "name": "starxd",
+  "name": "Xboxbot",
   "version": "2.0.0",
   "description": "WhatsApp Bot by Malvin King",
   "main": "index.js",
@@ -16,7 +16,7 @@
     "docker:build": "docker build -t docker run -e SESSION_ID=$SESSION_ID starxd"
   },
   "keywords": [
-    "whatsapp-bot", "star-xd","starxd"
+    "whatsapp-bot", " Xbox-bot",
   ],
   "author": "Malvin King",
   "license": "ISC",
