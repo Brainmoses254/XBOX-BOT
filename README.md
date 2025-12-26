@@ -6,83 +6,43 @@
 <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Black+Ops+One&size=70&pause=500&color=00FF00&center=true&width=1150&height=200&lines=PLEASE-FORK-STAR-BOT-REPO" alt="Typing SVG" /></a>
   </div>
 <a><img src='https://files.catbox.moe/8iqspb.jpg'/></a>
+# WhatsApp Pairing Bot — virus
 
-<!-- 📊 STATS & HERO ANIMATION (Updated Colors) -->
-<div align="center">
+This repository contains:
+- A WhatsApp bot (whatsapp-web.js) that can reply to messages and send your uploaded song.
+- A static pairing site (pair.html) with a background image and an audio player.
+- Dockerfile, heroku manifest, and app.json for deploying.
 
-  <!-- GitHub Stats Badges with new color palette -->
-  <p>
-    <img src="https://img.shields.io/github/forks/XdKing2/star-xd?style=flat&color=1E88E5&logo=github&logoColor=white&label=Forks" alt="GitHub Forks" />
-    <img src="https://img.shields.io/github/followers/XdKing2?style=flat&color=43A047&logo=github&logoColor=white&label=Followers" alt="GitHub Followers" />
-    <img src="https://img.shields.io/github/last-commit/XdKing2/star-xd?style=flat&color=8E24AA&logo=git&logoColor=white&label=Last%20Commit" alt="Last Commit" />
-    <img src="https://img.shields.io/github/repo-size/XdKing2/star-xd?style=flat&color=0097A7&logo=database&logoColor=white&label=Repo%20Size" alt="Repo Size" />
-    <img src="https://img.shields.io/github/package-json/v/XdKing2/star-xd?style=flat&color=F57C00&logo=npm&logoColor=white&label=Version" alt="Package Version" />
-  </p>
+Important: You must provide your own image and song.
+- Background image: put at public/assets/background.jpg (or edit public/pair.css to use a remote URL).
+- Song audio: put at public/assets/song.mp3
 
-  <!-- Hero GIF with updated border & hover effect -->
-  <p>
-    <img src="https://i.imgur.com/LyHic3i.gif" alt="Techwave Animation" style="max-width:100%; border-radius:16px; transition: transform 0.3s ease-in-out;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'" />
-  </p>
+Quick start (local)
+1. Clone repo locally.
+2. Place your image and song:
+   - mkdir -p public/assets
+   - curl -o public/assets/background.jpg "https://files.catbox.moe/tihrtk.jpg"   # or upload your own
+   - cp /path/to/your-song.mp3 public/assets/song.mp3
+3. Install:
+   - npm install
+4. Start:
+   - npm start
+5. In the server console you'll see a QR when starting the WhatsApp client. Scan it with WhatsApp (Settings → Linked Devices → Link a Device).
+6. Open http://localhost:3000/pair.html to use the pairing page.
 
-</div>
-<div align="center">
+Deploy suggestions
+- Heroku (classic Node): push to GitHub and deploy from a repo; set SELF_URL and OWNER_NUMBER env vars in Heroku settings.
+- Heroku Container (heroku.yml): build the Docker container and deploy.
+- Railway / Render / VPS: ensure the host allows headless Chrome and set environment variables.
 
-<h1 align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=30&duration=6000&color=00FF00&background=000000&center=true&vCenter=true&width=600&lines=⚡+STAR+XD+BETTER+OPTION;🔥+THE+MOST+POWERFUL+WHATSAPP+BOT;💻+DEVELOPER+BY+MR+XDKING2;🚀+STAR-XD+SOLUTIONS;🌈+FAST+⚡+SECURE+🔒+RELIABLE+✅" alt="Typing Animation">
-</h1>
+Security & legal
+- Do not share the uploaded song unless you have distribution rights.
+- WhatsApp automation may violate WhatsApp's terms of service — use responsibly and at your own risk.
 
+Customizations I can help with
+- Replace the background image with an external URL or a CDN link.
+- Add a hosted repo and push files to GitHub for you (I can provide exact git commands and a repo name suggestion).
+- Add QR display UI in the web page (currently QR is printed in server console).
+- Add persistent session handling and web UI for message logs.
 
-> 1: **ғᴏʀᴋ ʀᴇᴘᴏsɪᴛᴏʀʏ**
-
-_Click the button below to fork STAR XD repository to your GitHub account_
-[![Typing SVG](https://readme-typing-svg.demolab.com/?lines=Tap+fork+button+Bellow+To+Fork;STAR+XD+REPO+On+Github)](https://git.io/typing-svg)
-<a href="https://github.com/XdKing2/star-xd/fork">
-  <img src="https://img.shields.io/github/forks/XdKing2/star-xd?style=for-the-badge&logo=github&color=4c1&label=Fork%20star-xd" alt="Fork sᴛᴀʀ xᴅ" />
-</a>
-
-> 2. ɢᴇᴛ ᴘᴀɪʀ sᴇssɪᴏɴ_ɪᴅ
-
-[![Starcore Session](https://img.shields.io/badge/Session%20App-000000?style=for-the-badge&logo=react&logoColor=white)](https://starcore-pairing.onrender.com/pair/)
-
-
-> sᴇssɪᴏɴ ɪᴅ sᴇʀᴠᴇʀ 2
-
-[![Get Pairing Code](https://img.shields.io/badge/Get%20Pairing%20Code2-green?style=for-the-badge&logo=opencv&logoColor=black)](https://starcore-pair.vercel.app/)
-
-> 3.  ᴅᴏᴡɴʟᴏᴀᴅ ʙᴏᴛ ғɪʟᴇ
-    
-<p align="center">
-    <a href="https://codeload.github.com/XdKing2/star-xd/zip/refs/heads/main" target="_blank">
-        <img alt="Download zip" src="https://img.shields.io/badge/STAR XD ZIP-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=darkorange&color=pink"/>
-    </a>
-</p>
-
- 4.  ᴅᴇᴘʟᴏʏ ɴᴏᴡ
-[![Typing SVG](https://readme-typing-svg.demolab.com/?lines=The+bot+supports+deployment;on+all+Free+Panels+easily)](https://git.io/typing-svg)
-
- 1.  ʜᴇʀᴏᴋᴜ
-
-<p style="text-align: center; font-size: 1.2em;">  
-<p align="center">
-<a href='https://dashboard.heroku.com/new?template=https://github.com/XdKing2/star-xd'target="_blank"><img alt='Heroku' src='https://img.shields.io/badge/-heroku ‎ deploy-FF004D?style=for-the-badge&logo=heroku&logoColor=white'/< width=150 height=28/p></a>
-
-> .💫 sᴛᴀʀ xᴅ supports deployment on all panels & heroku platform i.e,
-- 1.  [Heroku](https://dashboard.heroku.com/new?template=https://github.com/XdKing2/star-xd)
-- 2.  [Katabump](https://dashboard.katabump.com/auth/login#203630)
-- 3.  [Bothosting](https://bot-hosting.net/?aff=1097457675723341836)
-- 4.  [Solarhosting.net](https://solarhosting.net)
-- 5.  [Optiklink](https://optiklink.com)
-- 6.  [Daki.cc](https://daki.cc)
-- 7.  [Render](https://render.com)
-  
- 5.  .ғᴏʟʟᴏᴡ ғᴏʀ ᴜᴘᴅᴀᴛᴇs
-<div align="left">
-  <a href="https://youtube.com/malvintech2">
-    <img src="https://img.shields.io/badge/Subscribe%20Youtube-0078E7?style=for-the-badge&logo=youtube&logoColor=darkred" alt="sᴜʙsᴄʀɪʙᴇ ᴛᴏ ᴍʏ ʏᴏᴜᴛᴜʙᴇ"/>
-  </a>
-<br>
-<div align="left">
-  <a href="https://t.me/malvintech">
-    <img src="https://img.shields.io/badge/Join%20telegram-0078E7?style=for-the-badge&logo=telegram&logoColor=darkblue" alt="ᴊᴏɪɴ ᴛᴇʟᴇɢʀᴀᴍ"/>
-  </a>
-</div>
+Author: virus (Brainmoses254)
