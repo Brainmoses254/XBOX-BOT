@@ -1,40 +1,54 @@
-import React, { useState, useEffect } from 'react';
+const fs = require('fs');
+const path = require('path');
 
-const defaultSettings = { theme: 'light', language: 'en', notifications: true };
+const DEFAULTS = {
+  backgroundImage: path.resolve(__dirname, 'assets', 'background.jpg'),
+  songFile: path.resolve(__dirname, 'assets', 'song.mp3'),
+  owner: '' // optional owner phone number in international format e.g. "1234567890@s.whatsapp.net"
+};
 
-export default function Setting({ initial = defaultSettings, onChange }) {
-  const [settings, setSettings] = useState(initial);
+class Setting {
+  constructor(filepath) {
+    this.filepath = filepath || path.resolve(process.cwd(), 'settings.json');
+    this.data = { ...DEFAULTS };
+    this._load();
+  }
 
-  useEffect(() => {
-    onChange && onChange(settings);
-  }, [settings]);
+  _load() {
+    try {
+      if (fs.existsSync(this.filepath)) {
+        const raw = fs.readFileSync(this.filepath, 'utf8');
+        const parsed = JSON.parse(raw);
+        this.data = { ...DEFAULTS, ...parsed };
+      } else {
+        this._save();
+      }
+    } catch (e) {
+      console.error('Failed to load settings:', e);
+    }
+  }
 
-  return (
-    <div className="settings">
-      <label>
-        Theme
-        <select value={settings.theme} onChange={e => setSettings({ ...settings, theme: e.target.value })}>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </label>
+  _save() {
+    try {
+      fs.writeFileSync(this.filepath, JSON.stringify(this.data, null, 2), 'utf8');
+    } catch (e) {
+      console.error('Failed to save settings:', e);
+    }
+  }
 
-      <label>
-        Language
-        <select value={settings.language} onChange={e => setSettings({ ...settings, language: e.target.value })}>
-          <option value="en">English</option>
-          <option value="es">Español</option>
-        </select>
-      </label>
+  get(key) {
+    return key ? this.data[key] : { ...this.data };
+  }
 
-      <label>
-        <input
-          type="checkbox"
-          checked={settings.notifications}
-          onChange={e => setSettings({ ...settings, notifications: e.target.checked })}
-        />
-        Enable notifications
-      </label>
-    </div>
-  );
+  set(key, value) {
+    this.data[key] = value;
+    this._save();
+  }
+
+  reset() {
+    this.data = { ...DEFAULTS };
+    this._save();
+  }
 }
+
+module.exports = Setting;
