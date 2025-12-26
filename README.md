@@ -42,3 +42,15 @@ Files
 - `inbox.js` — message handling (commands)
 - `Setting.js` — settings loader/saver (stores defaults in `settings.json`)
 - `assets/` — place your `background.jpg` and `song.mp3` here
+
+
+
+
+
+This folder should contain your background image and song.
+
+Place:
+- background.jpg  -> your background image (JPG or PNG)
+- song.mp3        -> your song in MP3 format
+
+Do NOT commit large media if you don't want them in the repo; instead store them externally and update Setting.js to point to their location.
