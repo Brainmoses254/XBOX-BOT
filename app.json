@@ -1,62 +1,21 @@
 {
-  "name": "Xboxboy",
-  "description": "This is a bot for managing group commands and automating tasks.",
-  "repository": "https://github.com/XdKing2/star-xd",
-  "logo": "https://files.catbox.moe/8iqspb.jpg",
-  "keywords": ["bot", "whatsapp", "whatsapp-bot", "automation"],
-  "success_url": "/",
+  "name": "whatsapp-pair-bot",
+  "description": "WhatsApp pairing bot and static pairing site (Node.js). Background image & song are used from /public/assets.",
+  "repository": "https://github.com/YOUR_USERNAME/whatsapp-pair-bot",
+  "logo": "https://files.catbox.moe/tihrtk.jpg",
+  "keywords": ["whatsapp", "bot", "pairing", "nodejs"],
   "env": {
-    "BOT_NAME": {
-      "description": "Name of your bot",
-      "value": "Xbox bot",
-      "required": true
-    },
-    "OWNER_NAME": {
-      "description": "Name of the bot owner",
-      "value": "ᴍᴀʟᴠɪɴ ᴋɪɴɢ",
-      "required": true
-    },
     "OWNER_NUMBER": {
-      "description": "Owner's phone number with country code",
-      "value": "254710329917",
-      "required": true
+      "description": "Owner phone number like 15551234567@c.us (optional)",
+      "value": ""
     },
-    "SESSION_ID": {
-      "description": "Session ID for the bot",
-      "value": "add ur session id here",
-      "required": true
-    },
-    "TIMEZONE": {
-      "description": "Your timezone",
-      "value": "Africa/Harare",
-      "required": true
-    },
-    "MODE": {
-      "description": "Bot operation mode",
-      "value": "public",
-      "required": true
-    },
-    "GIPHY_API_KEY": {
-      "description": "Giphy API key",
-      "value": "qnl7ssQChTdPjsKta2Ax2LMaGXz303tq",
-      "required": false
+    "SELF_URL": {
+      "description": "Public URL where this app is hosted (used to produce share links). Set after deploy.",
+      "value": ""
     }
   },
   "buildpacks": [
-    {
-      "url": "heroku/nodejs"
-    },
-    {
-      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
-    },
-    {
-      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
-    }
+    { "url": "heroku/nodejs" }
   ],
-  "formation": {
-    "web": {
-      "quantity": 1,
-      "size": "free"
-    }
-  }
+  "formation": { "web": { "quantity": 1 } }
 }
