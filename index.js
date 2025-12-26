@@ -1,65 +1,88 @@
-// inbox.js
-// Handles incoming WhatsApp messages. Customize triggers here.
-//
-// Example behavior implemented:
-//  - If user sends "ping", reply "pong".
-//  - If user sends "!song", the bot will attempt to send the server-hosted song (public/assets/song.mp3).
-//  - If user sends "!pair", bot will reply with a fresh pairing token URL (uses the server API).
-//
-// CAUTIONS:
-//  - Ensure you legally own the song you send or have permission to distribute it.
-
-const fetch = require('node-fetch');
-const path = require('path');
 const fs = require('fs');
-const { MessageMedia } = require('whatsapp-web.js');
+const path = require('path');
+const pino = require('pino');
+const qrcode = require('qrcode-terminal');
+const { default: makeWASocket, useSingleFileAuthState, fetchLatestBaileysVersion, DisconnectReason } = require('@adiwajshing/baileys');
 
-async function handleMessage(client, message) {
-  const body = (message.body || '').trim();
-  const from = message.from; // e.g., "15551234567@c.us"
+const Setting = require('./Setting');
+const { handleMessage } = require('./inbox');
 
-  // simple commands
-  if (!body) return;
+const logger = pino({ level: 'info' });
+const SESSION_FILE = process.env.SESSION_FILE || path.resolve(process.cwd(), 'auth_info.json');
 
-  if (body.toLowerCase() === 'ping') {
-    await client.sendMessage(from, 'pong');
-    return;
+(async () => {
+  // load settings
+  const settings = new Setting();
+
+  // Baileys auth state
+  const { state, saveState } = useSingleFileAuthState(SESSION_FILE);
+
+  // fetch version
+  let version = [2, 2204, 13];
+  try {
+    const got = await fetchLatestBaileysVersion();
+    version = got.version;
+    logger.info({ version }, 'Baileys version');
+  } catch (e) {
+    logger.warn('Could not fetch latest version, using fallback');
   }
 
-  if (body === '!song') {
-    // send the song file if present
-    const songPath = path.join(__dirname, 'public', 'assets', 'song.mp3');
-    if (fs.existsSync(songPath)) {
-      const media = MessageMedia.fromFilePath(songPath);
-      await client.sendMessage(from, media, { sendAudioAsVoice: false });
-    } else {
-      await client.sendMessage(from, 'Sorry — no song is uploaded on the server. Put your file at public/assets/song.mp3');
+  const sock = makeWASocket({
+    logger,
+    printQRInTerminal: false,
+    auth: state,
+    version
+  });
+
+  // print QR to terminal on first auth
+  sock.ev.on('connection.update', (update) => {
+    const { connection, lastDisconnect, qr } = update;
+    if (qr) {
+      qrcode.generate(qr, { small: true });
+      console.log('Scan the QR above with your WhatsApp mobile app.');
     }
-    return;
-  }
-
-  if (body === '!pair') {
-    // request server API to get a token (assumes server is reachable)
-    try {
-      const res = await fetch(`${process.env.SELF_URL || 'http://localhost:3000'}/api/pair`, { method: 'POST' });
-      const json = await res.json();
-      if (json.url) {
-        await client.sendMessage(from, `Pairing session created: ${json.url}\nExpires in a short time.`);
+    if (connection === 'close') {
+      const reason = (lastDisconnect && lastDisconnect.error && lastDisconnect.error.output) ? lastDisconnect.error.output.statusCode : lastDisconnect?.error?.message;
+      logger.warn('connection closed', { reason });
+      // try to reconnect on non-logout
+      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+        // reconnect by creating a new socket (simple approach)
+        setTimeout(() => {
+          process.exit(1); // let process manager restart if any
+        }, 2000);
       } else {
-        await client.sendMessage(from, 'Could not create pairing session.');
+        console.log('Logged out. Delete auth_info.json and restart to re-authenticate.');
+      }
+    } else if (connection === 'open') {
+      logger.info('Connected to WhatsApp');
+    }
+  });
+
+  // save auth state on changes
+  sock.ev.on('creds.update', saveState);
+
+  // listen for messages
+  sock.ev.on('messages.upsert', async (m) => {
+    try {
+      const messages = m.messages;
+      for (const msg of messages) {
+        // ignore status broadcasts
+        if (msg.key && msg.key.remoteJid && msg.key.remoteJid.endsWith('@status')) continue;
+        // ignore messages from self if you want
+        if (msg.key.fromMe) continue;
+        await handleMessage(sock, msg, settings);
       }
     } catch (err) {
-      await client.sendMessage(from, 'Failed to create pairing session: ' + err.message);
+      console.error('messages.upsert handler error:', err);
     }
-    return;
-  }
+  });
 
-  // default echo (for debugging)
-  if (body.length < 512) {
-    await client.sendMessage(from, `You said: "${body}"`);
-  } else {
-    // ignore very long messages
-  }
-}
-
-module.exports = { handleMessage };
+  // graceful shutdown
+  process.on('SIGINT', async () => {
+    logger.info('Shutting down...');
+    try {
+      await sock.logout();
+    } catch (e) {}
+    process.exit(0);
+  });
+})();
