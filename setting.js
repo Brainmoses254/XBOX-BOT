@@ -1,10 +1,40 @@
-//=====💫 Xbox bot🔥====
+import React, { useState, useEffect } from 'react';
 
-module.exports = {
-  BOT_NAME: 'Xbox bot', // ur bot name
-  OWNER_NAME: 'Xbox bot', //your name
-  OWNER_NUMBER: '254710329917', // add your phone number
-  SESSION_ID: '', // use sessin id if inbuilt pairing not working
-  MODE: "public", // public or private
-  TIMEZONE: 'Africa/Harare', // ur timezone
-};
+const defaultSettings = { theme: 'light', language: 'en', notifications: true };
+
+export default function Setting({ initial = defaultSettings, onChange }) {
+  const [settings, setSettings] = useState(initial);
+
+  useEffect(() => {
+    onChange && onChange(settings);
+  }, [settings]);
+
+  return (
+    <div className="settings">
+      <label>
+        Theme
+        <select value={settings.theme} onChange={e => setSettings({ ...settings, theme: e.target.value })}>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+
+      <label>
+        Language
+        <select value={settings.language} onChange={e => setSettings({ ...settings, language: e.target.value })}>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={settings.notifications}
+          onChange={e => setSettings({ ...settings, notifications: e.target.checked })}
+        />
+        Enable notifications
+      </label>
+    </div>
+  );
+}
