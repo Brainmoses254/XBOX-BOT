@@ -1,4 +1,23 @@
+# Node
 node_modules/
-session/
+npm-debug.log
+yarn-error.log
+
+# Local env
 .env
+
+# Baileys auth state
+auth_info.json
+sessions/
+.session/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
+Thumbs.db
