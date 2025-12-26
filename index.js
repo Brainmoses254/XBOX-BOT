@@ -1,88 +1,73 @@
 const fs = require('fs');
 const path = require('path');
-const pino = require('pino');
-const qrcode = require('qrcode-terminal');
-const { default: makeWASocket, useSingleFileAuthState, fetchLatestBaileysVersion, DisconnectReason } = require('@adiwajshing/baileys');
+const { MessageType, downloadContentFromMessage } = require('@adiwajshing/baileys'); // MessageType is deprecated in v5 but left for clarity
 
-const Setting = require('./Setting');
-const { handleMessage } = require('./inbox');
-
-const logger = pino({ level: 'info' });
-const SESSION_FILE = process.env.SESSION_FILE || path.resolve(process.cwd(), 'auth_info.json');
-
-(async () => {
-  // load settings
-  const settings = new Setting();
-
-  // Baileys auth state
-  const { state, saveState } = useSingleFileAuthState(SESSION_FILE);
-
-  // fetch version
-  let version = [2, 2204, 13];
+/**
+ * handleMessage(conn, msg, settings)
+ * - conn: Baileys socket instance (makeWASocket)
+ * - msg: incoming message (proto)
+ * - settings: instance of Setting (from Setting.js) or plain object with backgroundImage and songFile
+ */
+async function handleMessage(conn, msg, settings) {
   try {
-    const got = await fetchLatestBaileysVersion();
-    version = got.version;
-    logger.info({ version }, 'Baileys version');
-  } catch (e) {
-    logger.warn('Could not fetch latest version, using fallback');
-  }
+    // some messages are system events; skip
+    if (!msg.message || !msg.key) return;
 
-  const sock = makeWASocket({
-    logger,
-    printQRInTerminal: false,
-    auth: state,
-    version
-  });
+    const from = msg.key.remoteJid;
+    const isGroup = from.endsWith('@g.us');
+    // extract text (works for extended messages)
+    const messageContent = msg.message.conversation || msg.message.extendedTextMessage && msg.message.extendedTextMessage.text || '';
+    const text = (messageContent || '').trim();
 
-  // print QR to terminal on first auth
-  sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect, qr } = update;
-    if (qr) {
-      qrcode.generate(qr, { small: true });
-      console.log('Scan the QR above with your WhatsApp mobile app.');
+    // basic commands
+    if (!text) return;
+
+    const lower = text.toLowerCase();
+
+    if (lower === '!help' || lower === 'help') {
+      const helpText = [
+        'WhatsApp Bot Commands:',
+        '!help - show this message',
+        '!background - receive the configured background image',
+        '!song - receive the configured song (mp3)'
+      ].join('\n');
+      await conn.sendMessage(from, { text: helpText }, { quoted: msg });
+      return;
     }
-    if (connection === 'close') {
-      const reason = (lastDisconnect && lastDisconnect.error && lastDisconnect.error.output) ? lastDisconnect.error.output.statusCode : lastDisconnect?.error?.message;
-      logger.warn('connection closed', { reason });
-      // try to reconnect on non-logout
-      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-        // reconnect by creating a new socket (simple approach)
-        setTimeout(() => {
-          process.exit(1); // let process manager restart if any
-        }, 2000);
+
+    if (lower === '!background') {
+      const imgPath = settings.get ? settings.get('backgroundImage') : settings.backgroundImage;
+      if (fs.existsSync(imgPath)) {
+        const buffer = fs.readFileSync(imgPath);
+        await conn.sendMessage(from, { image: buffer, caption: 'Background image' }, { quoted: msg });
       } else {
-        console.log('Logged out. Delete auth_info.json and restart to re-authenticate.');
+        await conn.sendMessage(from, { text: `Background not found. Expected at: ${imgPath}` }, { quoted: msg });
       }
-    } else if (connection === 'open') {
-      logger.info('Connected to WhatsApp');
+      return;
     }
-  });
 
-  // save auth state on changes
-  sock.ev.on('creds.update', saveState);
-
-  // listen for messages
-  sock.ev.on('messages.upsert', async (m) => {
-    try {
-      const messages = m.messages;
-      for (const msg of messages) {
-        // ignore status broadcasts
-        if (msg.key && msg.key.remoteJid && msg.key.remoteJid.endsWith('@status')) continue;
-        // ignore messages from self if you want
-        if (msg.key.fromMe) continue;
-        await handleMessage(sock, msg, settings);
+    if (lower === '!song') {
+      const songPath = settings.get ? settings.get('songFile') : settings.songFile;
+      if (fs.existsSync(songPath)) {
+        const buffer = fs.readFileSync(songPath);
+        // send as audio (not voice note)
+        await conn.sendMessage(from, { audio: buffer, mimetype: 'audio/mpeg' }, { quoted: msg });
+      } else {
+        await conn.sendMessage(from, { text: `Song not found. Expected at: ${songPath}` }, { quoted: msg });
       }
-    } catch (err) {
-      console.error('messages.upsert handler error:', err);
+      return;
     }
-  });
 
-  // graceful shutdown
-  process.on('SIGINT', async () => {
-    logger.info('Shutting down...');
+    // default: reply simple echo (optional)
+    // await conn.sendMessage(from, { text: `You said: ${text}` }, { quoted: msg });
+  } catch (err) {
+    console.error('inbox handler error:', err);
     try {
-      await sock.logout();
-    } catch (e) {}
-    process.exit(0);
-  });
-})();
+      if (msg && msg.key && msg.key.remoteJid) {
+        await conn.sendMessage(msg.key.remoteJid, { text: 'Sorry, an error occurred processing your request.' }, { quoted: msg });
+      }
+    } catch (_) {}
+  }
+}
+
+module.exports = { handleMessage };
